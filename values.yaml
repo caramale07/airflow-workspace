@@ -92,14 +92,13 @@ logs:
 # Airflow - DAGs Configs
 ###################################
 dags:
-  persistence:
-    enabled: false 
-  gitsync:
+  gitSync:
     enabled: true
-    repo: git@github.com:<username>/<private-repo-name>.git
-    branch: <branch-name>
-    subPath: ""
-    sshKeySecret: airflow-ssh-secret
+    repo: https://github.com/caramale07/airflow-workspace.git
+    branch: master
+    rev: HEAD
+    syncWait: 60
+    subPath: "data/dags"
 
 ###################################
 # Airflow - Ingress Configs
