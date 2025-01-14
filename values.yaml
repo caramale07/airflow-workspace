@@ -1,0 +1,136 @@
+###################################
+# Airflow - General Configs
+###################################
+airflow:
+  image:
+    repository: apache/airflow
+    tag: 2.8.4-python3.9
+  executor: CeleryExecutor
+  config:
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+  users:
+    - username: admin
+      password: adminpassword
+      role: Admin
+      email: admin@example.com
+      firstName: Admin
+      lastName: User
+
+###################################
+# Airflow - Scheduler Configs
+###################################
+scheduler:
+  replicas: 1
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+###################################
+# Airflow - Webserver Configs
+###################################
+web:
+  replicas: 1
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+###################################
+# Airflow - Workers Configs
+###################################
+workers:
+  replicas: 1
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+  # Optional: autoscaling for workers 
+  # autoscaling:
+  #   enabled: true
+  #   minReplicas: 1
+  #   maxReplicas: 5
+  #   targetCPUUtilizationPercentage: 80
+
+###################################
+# Airflow - Triggerer Configs
+###################################
+triggerer:
+  enabled: false
+
+###################################
+# Airflow - Flower Configs
+###################################
+flower:
+  enabled: true
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+
+###################################
+# Airflow - Logs Configs
+###################################
+logs:
+  persistence:
+    enabled: true
+
+###################################
+# Airflow - DAGs Configs
+###################################
+dags:
+  persistence:
+    enabled: false 
+  gitsync:
+    enabled: true
+    repo: git@github.com:<username>/<private-repo-name>.git
+    branch: <branch-name>
+    subPath: ""
+    sshKeySecret: airflow-ssh-secret
+
+###################################
+# Airflow - Ingress Configs
+###################################
+ingress:
+  enabled: false
+
+###################################
+# Embedded PostgreSQL Configs
+###################################
+postgresql:
+  enabled: true
+  persistence:
+    enabled: false
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+###################################
+# Embedded Redis Configs
+###################################
+redis:
+  enabled: true
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
