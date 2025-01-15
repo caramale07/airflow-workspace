@@ -4,28 +4,38 @@ from datetime import datetime
 import pandas as pd
 import os
 
-# Paths
-url = "https://github.com/caramale07/airflow-workspace/raw/refs/heads/master/data/sales_transactions.parquet"
-output_file = "data/sales_transactions_transformed.parquet"
+# File paths
+RAW_FILE = "data/raw_sales.parquet"
+TRANSFORMED_FILE = "data/transformed_sales.parquet"
 
-# Transformation function
-def transform_parquet():
-    # Read the Parquet file
-    df = pd.read_parquet(url)
-    
-    # Transform: Split the timestamp into year, month, day
+# Load data
+def load_data():
+    url = "https://github.com/caramale07/airflow-workspace/raw/refs/heads/master/data/sales_transactions.parquet"
+    os.makedirs(os.path.dirname(RAW_FILE), exist_ok=True)
+    pd.read_parquet(url).to_parquet(RAW_FILE, index=False)
+    print(f"Raw data saved at {RAW_FILE}")
+
+# Transform data
+def transform_data():
+    df = pd.read_parquet(RAW_FILE)
     df["year"] = df["timestamp"].dt.year
     df["month"] = df["timestamp"].dt.month
     df["day"] = df["timestamp"].dt.day
-    
-    # Additional transformation: Calculate total price
     df["total_price"] = df["quantity"] * df["price"]
-    
-    # Save transformed data to a new Parquet file
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    df.to_parquet(output_file, index=False)
+    os.makedirs(os.path.dirname(TRANSFORMED_FILE), exist_ok=True)
+    df.to_parquet(TRANSFORMED_FILE, index=False)
+    print(f"Transformed data saved at {TRANSFORMED_FILE}")
 
-    print(f"Transformed Parquet file saved at {output_file}")
+# Validate data
+def validate_data():
+    if not os.path.exists(TRANSFORMED_FILE):
+        raise FileNotFoundError(f"Transformed file {TRANSFORMED_FILE} not found.")
+    
+    df = pd.read_parquet(TRANSFORMED_FILE)
+    required_columns = {"year", "month", "day", "total_price"}
+    if not required_columns.issubset(df.columns):
+        raise ValueError(f"Missing required columns in {TRANSFORMED_FILE}. Found: {df.columns}")
+    print(f"Validation passed: {TRANSFORMED_FILE}")
 
 # Default arguments
 default_args = {
@@ -35,15 +45,26 @@ default_args = {
 
 # DAG definition
 with DAG(
-    dag_id="parquet_transform_dag",
+    dag_id="modular_data_pipeline",
     default_args=default_args,
     schedule_interval=None,
     catchup=False,
 ) as dag:
 
-    transform_task = PythonOperator(
-        task_id="transform_parquet",
-        python_callable=transform_parquet,
+    load_task = PythonOperator(
+        task_id="load_data",
+        python_callable=load_data,
     )
 
-    transform_task
+    transform_task = PythonOperator(
+        task_id="transform_data",
+        python_callable=transform_data,
+    )
+
+    validate_task = PythonOperator(
+        task_id="validate_data",
+        python_callable=validate_data,
+    )
+
+    # Define task dependencies
+    load_task >> transform_task >> validate_task
