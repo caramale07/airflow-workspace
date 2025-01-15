@@ -5,13 +5,13 @@ import pandas as pd
 import os
 
 # Paths
-input_file = "https://github.com/caramale07/airflow-workspace/blob/master/data/sales_transactions.parquet"
+url = "https://github.com/caramale07/airflow-workspace/raw/refs/heads/master/data/sales_transactions.parquet"
 output_file = "data/sales_transactions_transformed.parquet"
 
 # Transformation function
 def transform_parquet():
     # Read the Parquet file
-    df = pd.read_parquet(input_file, engine="pyarrow")
+    df = pd.read_parquet(url)
     
     # Transform: Split the timestamp into year, month, day
     df["year"] = df["timestamp"].dt.year

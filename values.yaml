@@ -16,7 +16,8 @@ airflow:
       email: admin@example.com
       firstName: Admin
       lastName: User
-
+  extraPipPackages:
+    - pyarrow==18.1.0
   extraVolumeMounts:
     ## spec: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#volumemount-v1-core
     - name: logs-volume
@@ -60,7 +61,7 @@ web:
 # Airflow - Workers Configs
 ###################################
 workers:
-  replicas: 1
+  replicas: 2
   resources:
     requests:
       memory: 1Gi
