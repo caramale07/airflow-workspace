@@ -11,7 +11,7 @@ output_file = "data/sales_transactions_transformed.parquet"
 # Transformation function
 def transform_parquet():
     # Read the Parquet file
-    df = pd.read_parquet(input_file)
+    df = pd.read_parquet(input_file, engine="pyarrow")
     
     # Transform: Split the timestamp into year, month, day
     df["year"] = df["timestamp"].dt.year
