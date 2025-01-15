@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 # Paths
-input_file = "data/sales_transactions.parquet"
+input_file = "https://github.com/caramale07/airflow-workspace/blob/master/data/sales_transactions.parquet"
 output_file = "data/sales_transactions_transformed.parquet"
 
 # Transformation function
