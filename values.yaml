@@ -16,8 +16,8 @@ airflow:
       email: admin@example.com
       firstName: Admin
       lastName: User
-  extraPipPackages:
-    - pyarrow==18.1.0
+  # extraPipPackages:
+  #   - pyarrow==18.1.0
   extraVolumeMounts:
     ## spec: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#volumemount-v1-core
     - name: logs-volume
@@ -39,10 +39,10 @@ scheduler:
   resources:
     requests:
       memory: 512Mi
-      cpu: 250m
+      cpu: 500m
     limits:
       memory: 1Gi
-      cpu: 500m
+      cpu: 1
 
 ###################################
 # Airflow - Webserver Configs
@@ -65,10 +65,10 @@ workers:
   resources:
     requests:
       memory: 1Gi
-      cpu: 500m
+      cpu: 1
     limits:
       memory: 2Gi
-      cpu: 1
+      cpu: 2
   # Optional: autoscaling for workers 
   # autoscaling:
   #   enabled: true
