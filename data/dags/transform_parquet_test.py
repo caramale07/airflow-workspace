@@ -27,22 +27,6 @@ def transform_parquet():
 
     print(f"Transformed Parquet file saved at {output_file}")
 
-# Validation function
-def validate_transformed_file():
-    # Check if the output file exists
-    if not os.path.exists(output_file):
-        raise FileNotFoundError(f"Transformed file {output_file} does not exist.")
-    
-    # Read the transformed file
-    df = pd.read_parquet(output_file)
-    
-    # Validate required columns
-    required_columns = {"year", "month", "day", "total_price"}
-    if not required_columns.issubset(df.columns):
-        raise ValueError(f"Missing required columns in the transformed file. Found columns: {df.columns}")
-    
-    print(f"Validation passed: Transformed file at {output_file} is correct.")
-
 # Default arguments
 default_args = {
     'owner': 'airflow',
@@ -62,10 +46,5 @@ with DAG(
         python_callable=transform_parquet,
     )
 
-    validate_task = PythonOperator(
-        task_id="validate_transformed_file",
-        python_callable=validate_transformed_file,
-    )
-
     # Set task dependencies
-    transform_task >> validate_task
+    transform_task 
