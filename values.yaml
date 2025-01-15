@@ -17,6 +17,19 @@ airflow:
       firstName: Admin
       lastName: User
 
+  extraVolumeMounts:
+    ## spec: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#volumemount-v1-core
+    - name: logs-volume
+      mountPath: /opt/airflow/logs
+
+  extraVolumes:
+    ## spec: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#volume-v1-core
+    - name: logs-volume
+      hostPath:
+        ## WARNING: this represents a local path on the Kubernetes Node
+        path: /tmp/airflow
+        type: DirectoryOrCreate
+
 ###################################
 # Airflow - Scheduler Configs
 ###################################
@@ -86,18 +99,19 @@ flower:
 ###################################
 logs:
   persistence:
-    enabled: true
+    enabled: false
 
 ###################################
 # Airflow - DAGs Configs
 ###################################
 dags:
+  persistence:
+    enabled: false 
   gitSync:
     enabled: true
     repo: https://github.com/caramale07/airflow-workspace.git
     branch: master
     rev: HEAD
-    syncWait: 60
     subPath: "data/dags"
 
 ###################################
