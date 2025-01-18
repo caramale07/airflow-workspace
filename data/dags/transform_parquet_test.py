@@ -39,14 +39,14 @@ default_args = {
 
 # DAG definition
 with DAG(
-    dag_id="parquet_transform_dag",
+    dag_id="parquet_transform_dag-v1",
     default_args=default_args,
     schedule_interval=None,
     catchup=False,
 ) as dag:
 
     transform_task = PythonOperator(
-        task_id="transform_parquet",
+        task_id="transform_parquet-v1",
         python_callable=transform_parquet,
     )
 
