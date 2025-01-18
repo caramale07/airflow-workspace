@@ -1,0 +1,147 @@
+###################################
+# Airflow - General Configs
+###################################
+airflow:
+  image:
+    repository: caramale07/airflow-prodata
+  executor: CeleryExecutor
+  config:
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+  users:
+    - username: admin
+      password: adminpassword
+      role: Admin
+      email: admin@example.com
+      firstName: Admin
+      lastName: User
+  extraVolumeMounts:
+    ## spec: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#volumemount-v1-core
+    - name: logs-volume
+      mountPath: /opt/airflow/logs
+
+  extraVolumes:
+    ## spec: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#volume-v1-core
+    - name: logs-volume
+      hostPath:
+        ## WARNING: this represents a local path on the Kubernetes Node
+        path: /tmp/airflow
+        type: DirectoryOrCreate
+
+###################################
+# Airflow - Scheduler Configs
+###################################
+scheduler:
+  replicas: 1
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 1
+
+###################################
+# Airflow - Webserver Configs
+###################################
+web:
+  replicas: 1
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+###################################
+# Airflow - Workers Configs
+###################################
+workers:
+  replicas: 2
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 1
+    limits:
+      memory: 2Gi
+      cpu: 2
+  # Optional: autoscaling for workers 
+  # autoscaling:
+  #   enabled: true
+  #   minReplicas: 1
+  #   maxReplicas: 5
+  #   targetCPUUtilizationPercentage: 80
+
+###################################
+# Airflow - Triggerer Configs
+###################################
+triggerer:
+  enabled: false
+
+###################################
+# Airflow - Flower Configs
+###################################
+flower:
+  enabled: true
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+
+###################################
+# Airflow - Logs Configs
+###################################
+logs:
+  persistence:
+    enabled: false
+
+###################################
+# Airflow - DAGs Configs
+###################################
+dags:
+  persistence:
+    enabled: false 
+  gitSync:
+    enabled: true
+    repo: https://github.com/caramale07/airflow-workspace.git
+    branch: master
+    rev: HEAD
+    subPath: "data/dags"
+
+###################################
+# Airflow - Ingress Configs
+###################################
+ingress:
+  enabled: false
+
+###################################
+# Embedded PostgreSQL Configs
+###################################
+postgresql:
+  enabled: true
+  persistence:
+    enabled: false
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+###################################
+# Embedded Redis Configs
+###################################
+redis:
+  enabled: true
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m

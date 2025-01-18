@@ -1,0 +1,4 @@
+minikube start --cpus=4 --memory=4096 --disk-size=50g
+
+minikube mount "C:\Users\fatulla.bashirov\PRODATA\airflow-workspace:/mnt/data/airflow"
+
