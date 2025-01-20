@@ -35,7 +35,7 @@ default_args = {
 
 # DAG definition
 with DAG(
-    dag_id="parquet_transform_dag-v1",
+    dag_id="parquet_transform_dag-v2",
     default_args=default_args,
     schedule_interval=None,
     catchup=False,
