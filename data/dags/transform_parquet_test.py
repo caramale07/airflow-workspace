@@ -6,7 +6,7 @@ import numpy as np
 
 # Function to generate the Parquet data
 def generate_parquet_data(**kwargs):
-    rows = 3_000_000
+    rows = 1_000_000
     data = {
         "transaction_id": np.arange(1, rows + 1),
         "product_id": np.random.randint(1, 1000, size=rows),
