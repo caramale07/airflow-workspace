@@ -3,10 +3,14 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 import pandas as pd
 import numpy as np
+import dill  # For serialization
 
-# Function to generate the Parquet data
-def generate_parquet_data(**kwargs):
-    rows = 1_000_000
+# Path for temporary storage
+TEMP_FILE = "/tmp/generated_data.pkl"
+
+# Step 1: Generate Data
+def generate_parquet_data():
+    rows = 300_000  # Reduced size for scalability
     data = {
         "transaction_id": np.arange(1, rows + 1),
         "product_id": np.random.randint(1, 1000, size=rows),
@@ -18,33 +22,35 @@ def generate_parquet_data(**kwargs):
     # Create DataFrame
     df = pd.DataFrame(data)
 
-    # Push the DataFrame to XCom
-    kwargs['ti'].xcom_push(key='parquet_data', value=df)
-    print("Generated Parquet data")
+    # Serialize DataFrame to a temporary file
+    with open(TEMP_FILE, "wb") as f:
+        dill.dump(df, f)
 
-# Function to transform the Parquet data
-def transform_parquet_data(**kwargs):
-    # Pull the DataFrame from XCom
-    df = kwargs['ti'].xcom_pull(key='parquet_data', task_ids='generate_parquet_data')
+    print(f"Data serialized and saved to {TEMP_FILE}")
 
-    # Transform the data
+# Step 2: Transform Data
+def transform_parquet_data():
+    # Deserialize DataFrame from the temporary file
+    with open(TEMP_FILE, "rb") as f:
+        df = dill.load(f)
+
+    # Perform transformations
     df["year"] = df["timestamp"].dt.year
     df["month"] = df["timestamp"].dt.month
     df["day"] = df["timestamp"].dt.day
     df["total_price"] = df["quantity"] * df["price"]
 
-    print(f"Transformed Parquet data: {df.shape[0]} rows")
+    print(f"Transformed Data: {df.shape[0]} rows")
     print(df.head())
 
-# Default arguments
+# DAG Definition
 default_args = {
     'owner': 'airflow',
     'start_date': datetime(2025, 1, 15),
 }
 
-# DAG definition
 with DAG(
-    dag_id="in_memory_parquet_transform_dag",
+    dag_id="temp_file_data_transfer_dag",
     default_args=default_args,
     schedule_interval=None,
     catchup=False,
@@ -53,14 +59,11 @@ with DAG(
     generate_task = PythonOperator(
         task_id="generate_parquet_data",
         python_callable=generate_parquet_data,
-        provide_context=True,
     )
 
     transform_task = PythonOperator(
         task_id="transform_parquet_data",
         python_callable=transform_parquet_data,
-        provide_context=True,
     )
 
-    # Set task dependencies
     generate_task >> transform_task
