@@ -3,14 +3,9 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 import pandas as pd
 import numpy as np
-import os
 
-# Generate sample Parquet file locally
-def generate_parquet_file():
-    output_dir = "data"
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Generate 3 million rows of sample sales transaction data
+# Function to generate the Parquet data
+def generate_parquet_data(**kwargs):
     rows = 3_000_000
     data = {
         "transaction_id": np.arange(1, rows + 1),
@@ -23,29 +18,22 @@ def generate_parquet_file():
     # Create DataFrame
     df = pd.DataFrame(data)
 
-    # Save to Parquet
-    output_file = os.path.join(output_dir, "sales_transactions_3m.parquet")
-    df.to_parquet(output_file, index=False)
-    print(f"Parquet file generated at {output_file}")
+    # Push the DataFrame to XCom
+    kwargs['ti'].xcom_push(key='parquet_data', value=df)
+    print("Generated Parquet data")
 
-# Transformation function
-def transform_parquet():
-    input_file = "data/sales_transactions_3m.parquet"
-    if not os.path.exists(input_file):
-        raise FileNotFoundError(f"Parquet file not found at {input_file}")
+# Function to transform the Parquet data
+def transform_parquet_data(**kwargs):
+    # Pull the DataFrame from XCom
+    df = kwargs['ti'].xcom_pull(key='parquet_data', task_ids='generate_parquet_data')
 
-    # Read the Parquet file
-    df = pd.read_parquet(input_file)
-
-    # Transform: Split the timestamp into year, month, day
+    # Transform the data
     df["year"] = df["timestamp"].dt.year
     df["month"] = df["timestamp"].dt.month
     df["day"] = df["timestamp"].dt.day
-
-    # Additional transformation: Calculate total price
     df["total_price"] = df["quantity"] * df["price"]
 
-    print(f"Transformed Parquet file: {df.shape[0]} rows")
+    print(f"Transformed Parquet data: {df.shape[0]} rows")
     print(df.head())
 
 # Default arguments
@@ -56,20 +44,22 @@ default_args = {
 
 # DAG definition
 with DAG(
-    dag_id="local_parquet_transform_dag-v1",
+    dag_id="in_memory_parquet_transform_dag",
     default_args=default_args,
     schedule_interval=None,
     catchup=False,
 ) as dag:
 
     generate_task = PythonOperator(
-        task_id="generate_parquet_file",
-        python_callable=generate_parquet_file,
+        task_id="generate_parquet_data",
+        python_callable=generate_parquet_data,
+        provide_context=True,
     )
 
     transform_task = PythonOperator(
-        task_id="transform_parquet",
-        python_callable=transform_parquet,
+        task_id="transform_parquet_data",
+        python_callable=transform_parquet_data,
+        provide_context=True,
     )
 
     # Set task dependencies
