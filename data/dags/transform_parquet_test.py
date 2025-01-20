@@ -2,68 +2,57 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
 import pandas as pd
-import numpy as np
-import dill  # For serialization
+import os
+import requests
 
-# Path for temporary storage
-TEMP_FILE = "/tmp/generated_data.pkl"
+# Paths
+url = "https://fatulla.codage.az/data/sales_transactions_2m.parquet"
 
-# Step 1: Generate Data
-def generate_parquet_data():
-    rows = 300_000  # Reduced size for scalability
-    data = {
-        "transaction_id": np.arange(1, rows + 1),
-        "product_id": np.random.randint(1, 1000, size=rows),
-        "quantity": np.random.randint(1, 20, size=rows),
-        "price": np.random.uniform(5.0, 500.0, size=rows).round(2),
-        "timestamp": pd.date_range(start="2022-01-01", periods=rows, freq="S"),
-    }
 
-    # Create DataFrame
-    df = pd.DataFrame(data)
 
-    # Serialize DataFrame to a temporary file
-    with open(TEMP_FILE, "wb") as f:
-        dill.dump(df, f)
+# Transformation function
+def transform_parquet():
 
-    print(f"Data serialized and saved to {TEMP_FILE}")
-
-# Step 2: Transform Data
-def transform_parquet_data():
-    # Deserialize DataFrame from the temporary file
-    with open(TEMP_FILE, "rb") as f:
-        df = dill.load(f)
-
-    # Perform transformations
+    local_path = "/tmp/sales_transactions.parquet"
+    response = requests.get(url)
+    response.raise_for_status()  
+    
+    with open(local_path, "wb") as file:
+        file.write(response.content)
+            
+    # Read the Parquet file
+    df = pd.read_parquet(local_path)
+    
+    # Transform: Split the timestamp into year, month, day
     df["year"] = df["timestamp"].dt.year
     df["month"] = df["timestamp"].dt.month
     df["day"] = df["timestamp"].dt.day
+    
+    # Additional transformation: Calculate total price
     df["total_price"] = df["quantity"] * df["price"]
+    
 
-    print(f"Transformed Data: {df.shape[0]} rows")
+    print(f"Transformed Parquet file: {df.shape[0]} rows")
     print(df.head())
 
-# DAG Definition
+# Default arguments
 default_args = {
     'owner': 'airflow',
     'start_date': datetime(2025, 1, 15),
 }
 
+# DAG definition
 with DAG(
-    dag_id="temp_file_data_transfer_dag",
+    dag_id="parquet_transform_dag-v1",
     default_args=default_args,
     schedule_interval=None,
     catchup=False,
 ) as dag:
 
-    generate_task = PythonOperator(
-        task_id="generate_parquet_data",
-        python_callable=generate_parquet_data,
-    )
-
     transform_task = PythonOperator(
-        task_id="transform_parquet_data",
-        python_callable=transform_parquet_data,
+        task_id="transform_parquet-v1",
+        python_callable=transform_parquet,
     )
 
-    generate_task >> transform_task
+    # Set task dependencies
+    transform_task 
