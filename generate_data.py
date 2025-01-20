@@ -7,7 +7,7 @@ output_dir = "data"
 os.makedirs(output_dir, exist_ok=True)
 
 # Generate 1 million rows of sample sales transaction data
-rows = 2_000_000
+rows = 3_000_000
 data = {
     "transaction_id": np.arange(1, rows + 1),
     "product_id": np.random.randint(1, 1000, size=rows),
@@ -20,7 +20,7 @@ data = {
 df = pd.DataFrame(data)
 
 # Save to Parquet
-output_file = os.path.join(output_dir, "sales_transactions_2m.parquet")
+output_file = os.path.join(output_dir, "sales_transactions_3m.parquet")
 df.to_parquet(output_file, index=False)
 
 print(f"Parquet file generated at {output_file}")
