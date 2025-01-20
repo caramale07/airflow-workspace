@@ -8,13 +8,8 @@ import requests
 # Paths
 url = "https://fatulla.codage.az/data/sales_transactions_2m.parquet"
 
-
-
 # Transformation function
 def transform_parquet():
-
-
-            
     # Read the Parquet file
     df = pd.read_parquet(url)
     
@@ -26,7 +21,6 @@ def transform_parquet():
     # Additional transformation: Calculate total price
     df["total_price"] = df["quantity"] * df["price"]
     
-
     print(f"Transformed Parquet file: {df.shape[0]} rows")
     print(df.head())
 
@@ -38,16 +32,16 @@ default_args = {
 
 # DAG definition
 with DAG(
-    dag_id="parquet_transform_dag-v1",
+    dag_id="parquet_transform_dag_v1",
     default_args=default_args,
-    schedule_interval=None,
+    schedule_interval="*/1 * * * *",  # Cron expression for every 1 minute
     catchup=False,
 ) as dag:
 
     transform_task = PythonOperator(
-        task_id="transform_parquet-v1",
+        task_id="transform_parquet_v1",
         python_callable=transform_parquet,
     )
 
     # Set task dependencies
-    transform_task 
+    transform_task
