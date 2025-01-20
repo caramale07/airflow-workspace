@@ -13,15 +13,10 @@ url = "https://fatulla.codage.az/data/sales_transactions_2m.parquet"
 # Transformation function
 def transform_parquet():
 
-    local_path = "/tmp/sales_transactions.parquet"
-    response = requests.get(url)
-    response.raise_for_status()  
-    
-    with open(local_path, "wb") as file:
-        file.write(response.content)
+
             
     # Read the Parquet file
-    df = pd.read_parquet(local_path)
+    df = pd.read_parquet(url)
     
     # Transform: Split the timestamp into year, month, day
     df["year"] = df["timestamp"].dt.year
