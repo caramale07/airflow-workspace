@@ -6,8 +6,7 @@ import os
 import requests
 
 # Paths
-url = "https://fatulla.codage.az/data/sales_transactions.parquet"
-output_file = "data/sales_transactions_transformed.parquet"
+url = "https://fatulla.codage.az/data/sales_transactions_1m.parquet"
 
 
 
@@ -24,11 +23,8 @@ def transform_parquet():
     # Additional transformation: Calculate total price
     df["total_price"] = df["quantity"] * df["price"]
     
-    # Save transformed data to a new Parquet file
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    df.to_parquet(output_file, index=False)
 
-    print(f"Transformed Parquet file saved at {output_file}")
+    print(f"Transformed Parquet file: {df.shape[0]} rows")
     print(df.head())
 
 # Default arguments
@@ -46,7 +42,7 @@ with DAG(
 ) as dag:
 
     transform_task = PythonOperator(
-        task_id="transform_parquet-v1",
+        task_id="transform_parquet-v2",
         python_callable=transform_parquet,
     )
 
