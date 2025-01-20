@@ -58,6 +58,6 @@ def log_kubernetes_stats(target_namespace):
         time.sleep(5)  # Adjust the interval as needed
 
 if __name__ == "__main__":
-    TARGET_NAMESPACE = "airflow"  # Change to your Airflow namespace
+    TARGET_NAMESPACE = "airflow-kubernetes"  # Change to your Airflow namespace
 
     log_kubernetes_stats(TARGET_NAMESPACE)
