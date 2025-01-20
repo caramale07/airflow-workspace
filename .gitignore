@@ -1,4 +1,5 @@
 data/sales_transactions.parquet
 data/sales_transactions_transformed.parquet
 data/sales_transactions_1m.parquet
+data/sales_transactions_2m.parquet
 kubernetes_stats.log

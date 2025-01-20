@@ -6,7 +6,7 @@ import os
 import requests
 
 # Paths
-url = "https://fatulla.codage.az/data/sales_transactions.parquet"
+url = "https://fatulla.codage.az/data/sales_transactions_2m.parquet"
 
 
 
