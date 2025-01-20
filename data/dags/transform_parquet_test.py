@@ -34,7 +34,7 @@ default_args = {
 with DAG(
     dag_id="parquet_transform_dag_v1",
     default_args=default_args,
-    schedule_interval="*/2 * * * *",  # Cron expression for every 1 minute
+    schedule_interval="*/10 * * * *",  # Cron expression
     catchup=False,
 ) as dag:
 

@@ -2,8 +2,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
 import pandas as pd
-import os
-import requests
+
 
 # Paths
 url = "https://fatulla.codage.az/data/sales_transactions_3m.csv"
