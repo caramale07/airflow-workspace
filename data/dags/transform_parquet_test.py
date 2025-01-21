@@ -6,7 +6,7 @@ import os
 import requests
 
 # Paths
-url = "https://fatulla.codage.az/data/sales_transactions_1m.parquet"
+url = "https://fatulla.codage.az/data/sales_transactions_2m.parquet"
 
 # Transformation function
 def transform_parquet():
@@ -39,7 +39,7 @@ with DAG(
 ) as dag:
 
     transform_task = PythonOperator(
-        task_id="transform_parquet_v1",
+        task_id="transform_parquet_v2",
         python_callable=transform_parquet,
     )
 
