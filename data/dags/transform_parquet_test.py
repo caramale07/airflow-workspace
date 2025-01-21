@@ -6,7 +6,7 @@ import os
 import requests
 
 # Paths
-url = "https://fatulla.codage.az/data/sales_transactions_3m.parquet"
+url = "https://fatulla.codage.az/data/sales_transactions_10m.parquet"
 
 # Transformation function
 def transform_parquet():
@@ -34,12 +34,12 @@ default_args = {
 with DAG(
     dag_id="parquet_transform_dag_v1",
     default_args=default_args,
-    schedule_interval="*/3 * * * *",  # Cron expression
+    schedule_interval="*/10 * * * *",  # Cron expression
     catchup=False,
 ) as dag:
 
     transform_task = PythonOperator(
-        task_id="transform_parquet_v2",
+        task_id="transform_parquet_v10",
         python_callable=transform_parquet,
     )
 
