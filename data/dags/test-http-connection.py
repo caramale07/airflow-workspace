@@ -27,7 +27,7 @@ def transform_parquet():
 # Default arguments
 default_args = {
     'owner': 'airflow',
-    'start_date': datetime(2025, 1, 15),
+    'start_date': datetime(2025, 1, 22),
 }
 
 # DAG definition
