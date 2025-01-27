@@ -1,7 +1,7 @@
-# README: Analysis and Benchmarking of Airflow Executors
+# Analysis and Benchmarking of Airflow Executors
 
 ## Overview
-This repository benchmarks Airflow's **Celery Executor** and **Kubernetes Executor** to evaluate performance, scalability, and suitability for production. The project focuses on resource utilization, fault tolerance, and deployment readiness.
+This repository benchmarks Airflow's **Celery Executor** and **Kubernetes Executor** to evaluate performance, scalability, and suitability for production. It's focused on resource utilization, fault tolerance, and deployment readiness.
 
 ## Key Findings
 ### Feature Comparison
